@@ -1,6 +1,6 @@
-Fuel Amount,Facility,Month
-4500,Factory-A,2025-01
-6200,Factory-B,2025-01
-9800,Factory-C,2025-01
-18000,Factory-D,2025-01
-5100,Factory-E,2025-01
+Consumption_kWh,Facility,Billing_Month,Meter_ID,Tariff
+4500,Factory-A,2025-01,MTR001,Commercial
+6200,Factory-B,2025-01,MTR002,Commercial
+9800,Factory-C,2025-01,MTR003,Industrial
+18000,Factory-D,2025-01,MTR004,Industrial
+5100,Factory-E,2025-01,MTR005,Commercial

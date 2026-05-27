@@ -25,9 +25,9 @@ EMISSION_FACTORS = {
 
 # Candidate column names per source — tries each in order
 VALUE_COLUMNS = {
-    'SAP':     ['Fuel_Amount_Liters', 'Fuel Amount', 'fuel_amount', 'Quantity', 'quantity'],
-    'UTILITY': ['Consumption_kWh', 'kwh_consumed', 'kWh', 'consumption', 'Usage_kWh'],
-    'TRAVEL':  ['Distance_km', 'distance_km', 'Distance', 'distance', 'km'],
+    'SAP':     ['Fuel_Amount_Liters', 'Fuel Amount', 'fuel_amount', 'Quantity'],
+    'UTILITY': ['Consumption_kWh', 'kwh_consumed', 'Usage_kWh', 'kWh', 'Fuel Amount'],
+    'TRAVEL':  ['Distance_km', 'distance_km', 'Distance', 'km', 'Fuel Amount'],
 }
 
 

@@ -1,6 +1,6 @@
-Fuel Amount,Employee,Trip
-320,Mumbai-Delhi,Flight
-480,Bangalore-Singapore,Flight
-150,Delhi-Pune,Train
-22000,US-Europe,International Flight
-700,Hyderabad-Chennai,Flight
+Distance_km,Employee_ID,Origin,Destination,Transport_Mode,Trip_Date
+320,EMP001,Mumbai,Delhi,Flight,2025-01-05
+480,EMP002,Bangalore,Singapore,Flight,2025-01-08
+150,EMP003,Delhi,Pune,Train,2025-01-10
+22000,EMP004,Delhi,New York,International Flight,2025-01-12
+700,EMP005,Hyderabad,Chennai,Flight,2025-01-15
