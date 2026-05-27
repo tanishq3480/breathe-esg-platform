@@ -1,31 +1,16 @@
 from django.urls import path
-
 from .views import (
     upload_csv,
     pending_reviews,
     approve_record,
-    reject_record
+    reject_record,
+    all_records,
 )
 
 urlpatterns = [
-
-    path(
-        'upload/',
-        upload_csv
-    ),
-
-    path(
-        'review/pending/',
-        pending_reviews
-    ),
-
-    path(
-        'review/approve/<int:pk>/',
-        approve_record
-    ),
-
-    path(
-        'review/reject/<int:pk>/',
-        reject_record
-    ),
+    path('upload/', upload_csv),
+    path('records/', all_records),
+    path('review/pending/', pending_reviews),
+    path('review/approve/<int:pk>/', approve_record),
+    path('review/reject/<int:pk>/', reject_record),
 ]
