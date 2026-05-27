@@ -1,8 +1,6 @@
 from django.db import models
+from ingestion.models import NormalizedEmission
 
-from normalization.models import (
-    NormalizedActivity
-)
 
 class ReviewQueue(models.Model):
 
@@ -13,30 +11,15 @@ class ReviewQueue(models.Model):
     ]
 
     record = models.ForeignKey(
-        NormalizedActivity,
+        NormalizedEmission,
         on_delete=models.CASCADE
     )
-
-    reviewer = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-
-    review_notes = models.TextField(
-        blank=True
-    )
-
+    reviewer = models.CharField(max_length=255, null=True, blank=True)
+    review_notes = models.TextField(blank=True)
     status = models.CharField(
-        max_length=50,
-        choices=STATUS_CHOICES,
-        default="PENDING"
+        max_length=50, choices=STATUS_CHOICES, default="PENDING"
     )
-
-    reviewed_at = models.DateTimeField(
-        null=True,
-        blank=True
-    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return self.status
+        return f"{self.status} - Record {self.record_id}"
