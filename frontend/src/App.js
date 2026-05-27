@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import "./App.css";
 
@@ -10,8 +10,8 @@ function App() {
   const [sourceType, setSourceType] = useState("SAP");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
 
-  // FETCH PENDING REVIEWS
   const fetchPendingReviews = async () => {
     try {
       const response = await axios.get(
@@ -20,7 +20,7 @@ function App() {
 
       setRecords(response.data);
     } catch (error) {
-      console.error("Fetch error:", error);
+      console.error(error);
     }
   };
 
@@ -28,7 +28,6 @@ function App() {
     fetchPendingReviews();
   }, []);
 
-  // UPLOAD CSV
   const handleUpload = async () => {
     if (!file) {
       alert("Please select a CSV file");
@@ -48,14 +47,12 @@ function App() {
         formData,
         {
           headers: {
-            "Content-Type":
-              "multipart/form-data",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
 
-      setMessage("Upload successful!");
-
+      setMessage("Upload successful");
       fetchPendingReviews();
     } catch (error) {
       console.error(error);
@@ -65,7 +62,6 @@ function App() {
     }
   };
 
-  // APPROVE
   const approveReview = async (id) => {
     try {
       await axios.post(
@@ -74,11 +70,10 @@ function App() {
 
       fetchPendingReviews();
     } catch (error) {
-      console.error("Approve error:", error);
+      console.error(error);
     }
   };
 
-  // REJECT
   const rejectReview = async (id) => {
     try {
       await axios.post(
@@ -87,52 +82,111 @@ function App() {
 
       fetchPendingReviews();
     } catch (error) {
-      console.error("Reject error:", error);
+      console.error(error);
     }
   };
+
+  const filteredRecords = useMemo(() => {
+    return records.filter((record) => {
+      return (
+        record.category
+          ?.toLowerCase()
+          .includes(search.toLowerCase()) ||
+        record.value
+          ?.toString()
+          .includes(search)
+      );
+    });
+  }, [records, search]);
+
+  const totalRecords = records.length;
 
   return (
     <div className="container">
       <h1 className="title">
-        Breathe ESG Platform
+        ESG Intelligence Dashboard
       </h1>
+
+      <p className="subtitle">
+        Enterprise ESG ingestion and review system
+      </p>
+
+      <div className="metrics-grid">
+        <div className="metric-card">
+          <div className="metric-title">
+            Pending Reviews
+          </div>
+          <div className="metric-value">
+            {totalRecords}
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-title">
+            Source Types
+          </div>
+          <div className="metric-value">
+            3
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-title">
+            ESG Pipelines
+          </div>
+          <div className="metric-value">
+            Active
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-title">
+            System Status
+          </div>
+          <div className="metric-value">
+            Live
+          </div>
+        </div>
+      </div>
 
       <div className="upload-card">
         <h2>Upload ESG CSV</h2>
 
-        <select
-          value={sourceType}
-          onChange={(e) =>
-            setSourceType(e.target.value)
-          }
-          className="dropdown"
-        >
-          <option value="SAP">SAP</option>
-          <option value="Travel">
-            Travel
-          </option>
-          <option value="Utilities">
-            Utilities
-          </option>
-        </select>
+        <div className="upload-controls">
+          <select
+            value={sourceType}
+            onChange={(e) =>
+              setSourceType(e.target.value)
+            }
+            className="dropdown"
+          >
+            <option value="SAP">SAP</option>
+            <option value="Travel">
+              Travel
+            </option>
+            <option value="Utilities">
+              Utilities
+            </option>
+          </select>
 
-        <input
-          type="file"
-          accept=".csv"
-          onChange={(e) =>
-            setFile(e.target.files[0])
-          }
-          className="file-input"
-        />
+          <input
+            type="file"
+            accept=".csv"
+            onChange={(e) =>
+              setFile(e.target.files[0])
+            }
+            className="file-input"
+          />
 
-        <button
-          onClick={handleUpload}
-          className="upload-btn"
-        >
-          {loading
-            ? "Uploading..."
-            : "Upload CSV"}
-        </button>
+          <button
+            onClick={handleUpload}
+            className="upload-btn"
+          >
+            {loading
+              ? "Uploading..."
+              : "Upload CSV"}
+          </button>
+        </div>
 
         {message && (
           <p className="message">
@@ -142,17 +196,31 @@ function App() {
       </div>
 
       <div className="review-section">
-        <h2>Pending Reviews</h2>
+        <div className="review-header">
+          <h2>Pending Reviews</h2>
 
-        {records.length === 0 ? (
-          <p>No pending reviews</p>
+          <input
+            type="text"
+            placeholder="Search records..."
+            className="search-box"
+            value={search}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
+          />
+        </div>
+
+        {filteredRecords.length === 0 ? (
+          <div className="empty-state">
+            No pending reviews found.
+          </div>
         ) : (
-          records.map((record) => (
+          filteredRecords.map((record) => (
             <div
               key={record.id}
               className="record-card"
             >
-              <div>
+              <div className="record-details">
                 <p>
                   <strong>ID:</strong>{" "}
                   {record.id}
@@ -170,7 +238,9 @@ function App() {
 
                 <p>
                   <strong>Status:</strong>{" "}
-                  {record.status}
+                  <span className="status-badge">
+                    {record.status}
+                  </span>
                 </p>
               </div>
 
@@ -178,9 +248,7 @@ function App() {
                 <button
                   className="approve-btn"
                   onClick={() =>
-                    approveReview(
-                      record.id
-                    )
+                    approveReview(record.id)
                   }
                 >
                   Approve
@@ -189,9 +257,7 @@ function App() {
                 <button
                   className="reject-btn"
                   onClick={() =>
-                    rejectReview(
-                      record.id
-                    )
+                    rejectReview(record.id)
                   }
                 >
                   Reject
