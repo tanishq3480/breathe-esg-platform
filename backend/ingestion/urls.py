@@ -9,7 +9,10 @@ from .views import (
 
 urlpatterns = [
 
-    path('upload/', upload_csv),
+    path(
+        'upload/',
+        upload_csv
+    ),
 
     path(
         'review/pending/',
