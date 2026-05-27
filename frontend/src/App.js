@@ -2,24 +2,25 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
 
-const API = "https://breathe-esg-lxiv.onrender.com";
+const API = "https://breathe-esg-lxiv.onrender.com/api";
 
 function App() {
   const [records, setRecords] = useState([]);
   const [file, setFile] = useState(null);
   const [sourceType, setSourceType] = useState("SAP");
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Fetch pending reviews
+  // FETCH PENDING REVIEWS
   const fetchPendingReviews = async () => {
     try {
       const response = await axios.get(
-        `${API}/api/review/pending/`
+        `${API}/review/pending/`
       );
+
       setRecords(response.data);
     } catch (error) {
-      console.error("Error fetching reviews:", error);
+      console.error("Fetch error:", error);
     }
   };
 
@@ -27,7 +28,7 @@ function App() {
     fetchPendingReviews();
   }, []);
 
-  // Upload CSV
+  // UPLOAD CSV
   const handleUpload = async () => {
     if (!file) {
       alert("Please select a CSV file");
@@ -35,24 +36,26 @@ function App() {
     }
 
     const formData = new FormData();
+
     formData.append("file", file);
     formData.append("source_type", sourceType);
 
     try {
       setLoading(true);
-      setMessage("");
 
       await axios.post(
-        `${API}/api/ingest/upload/`,
+        `${API}/upload/`,
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type":
+              "multipart/form-data",
           },
         }
       );
 
       setMessage("Upload successful!");
+
       fetchPendingReviews();
     } catch (error) {
       console.error(error);
@@ -62,61 +65,80 @@ function App() {
     }
   };
 
-  // Approve review
+  // APPROVE
   const approveReview = async (id) => {
     try {
       await axios.post(
-        `${API}/api/review/${id}/approve/`
+        `${API}/review/approve/${id}/`
       );
 
       fetchPendingReviews();
     } catch (error) {
-      console.error(error);
+      console.error("Approve error:", error);
     }
   };
 
-  // Reject review
+  // REJECT
   const rejectReview = async (id) => {
     try {
       await axios.post(
-        `${API}/api/review/${id}/reject/`
+        `${API}/review/reject/${id}/`
       );
 
       fetchPendingReviews();
     } catch (error) {
-      console.error(error);
+      console.error("Reject error:", error);
     }
   };
 
   return (
     <div className="container">
-      <h1 className="title">Breathe ESG Platform</h1>
+      <h1 className="title">
+        Breathe ESG Platform
+      </h1>
 
       <div className="upload-card">
         <h2>Upload ESG CSV</h2>
 
         <select
           value={sourceType}
-          onChange={(e) => setSourceType(e.target.value)}
+          onChange={(e) =>
+            setSourceType(e.target.value)
+          }
           className="dropdown"
         >
           <option value="SAP">SAP</option>
-          <option value="Travel">Travel</option>
-          <option value="Utilities">Utilities</option>
+          <option value="Travel">
+            Travel
+          </option>
+          <option value="Utilities">
+            Utilities
+          </option>
         </select>
 
         <input
           type="file"
           accept=".csv"
-          onChange={(e) => setFile(e.target.files[0])}
+          onChange={(e) =>
+            setFile(e.target.files[0])
+          }
           className="file-input"
         />
 
-        <button onClick={handleUpload} className="upload-btn">
-          {loading ? "Uploading..." : "Upload CSV"}
+        <button
+          onClick={handleUpload}
+          className="upload-btn"
+        >
+          {loading
+            ? "Uploading..."
+            : "Upload CSV"}
         </button>
 
-        {message && <p className="message">{message}</p>}
+        {message && (
+          <p className="message">
+            {message}
+          </p>
+        )}
       </div>
 
       <div className="review-section">
@@ -126,11 +148,14 @@ function App() {
           <p>No pending reviews</p>
         ) : (
           records.map((record) => (
-            <div key={record.id} className="record-card">
-              <div className="record-info">
+            <div
+              key={record.id}
+              className="record-card"
+            >
+              <div>
                 <p>
-                  <strong>Source:</strong>{" "}
-                  {record.source_type}
+                  <strong>ID:</strong>{" "}
+                  {record.id}
                 </p>
 
                 <p>
@@ -153,7 +178,9 @@ function App() {
                 <button
                   className="approve-btn"
                   onClick={() =>
-                    approveReview(record.id)
+                    approveReview(
+                      record.id
+                    )
                   }
                 >
                   Approve
@@ -162,7 +189,9 @@ function App() {
                 <button
                   className="reject-btn"
                   onClick={() =>
-                    rejectReview(record.id)
+                    rejectReview(
+                      record.id
+                    )
                   }
                 >
                   Reject
