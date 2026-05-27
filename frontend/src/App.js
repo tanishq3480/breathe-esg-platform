@@ -26,7 +26,7 @@ function App() {
     try {
 
       const response = await axios.get(
-        "http://127.0.0.1:8000/api/review/pending/"
+        "http://breathe-esg-lxiv.onrender.com/api/review/pending/"
       );
 
       setRecords(response.data);
@@ -48,7 +48,7 @@ function App() {
   const approveRecord = async (id) => {
 
     await axios.post(
-      `http://127.0.0.1:8000/api/review/approve/${id}/`
+      `http://breathe-esg-lxiv.onrender.com/api/review/approve/${id}/`
     );
 
     fetchPending();
@@ -58,7 +58,7 @@ function App() {
   const rejectRecord = async (id) => {
 
     await axios.post(
-      `http://127.0.0.1:8000/api/review/reject/${id}/`
+      `http://breathe-esg-lxiv.onrender.com/api/review/reject/${id}/`
     );
 
     fetchPending();
@@ -86,7 +86,7 @@ function App() {
     try {
 
       await axios.post(
-        "http://127.0.0.1:8000/api/upload/",
+        "http://breathe-esg-lxiv.onrender.com/api/upload/",
         formData,
         {
           headers: {
