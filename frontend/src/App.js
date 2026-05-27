@@ -1,408 +1,177 @@
 import React, { useEffect, useState } from "react";
-
 import axios from "axios";
+import "./App.css";
 
-import "bootstrap/dist/css/bootstrap.min.css";
-
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-} from "recharts";
-
+const API = "https://breathe-esg-lxiv.onrender.com";
 
 function App() {
-
   const [records, setRecords] = useState([]);
   const [file, setFile] = useState(null);
-  const [sourceType, setSourceType] =
-    useState("SAP");
+  const [sourceType, setSourceType] = useState("SAP");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-
-  const fetchPending = async () => {
-
+  // Fetch pending reviews
+  const fetchPendingReviews = async () => {
     try {
-
       const response = await axios.get(
-        "http://breathe-esg-lxiv.onrender.com/api/review/pending/"
+        `${API}/api/review/pending/`
       );
-
       setRecords(response.data);
-
     } catch (error) {
-
-      console.error(error);
+      console.error("Error fetching reviews:", error);
     }
   };
 
-
   useEffect(() => {
-
-    fetchPending();
-
+    fetchPendingReviews();
   }, []);
 
-
-  const approveRecord = async (id) => {
-
-    await axios.post(
-      `http://breathe-esg-lxiv.onrender.com/api/review/approve/${id}/`
-    );
-
-    fetchPending();
-  };
-
-
-  const rejectRecord = async (id) => {
-
-    await axios.post(
-      `http://breathe-esg-lxiv.onrender.com/api/review/reject/${id}/`
-    );
-
-    fetchPending();
-  };
-
-
-  const uploadFile = async () => {
-
+  // Upload CSV
+  const handleUpload = async () => {
     if (!file) {
-
-      alert("Choose CSV file");
-
+      alert("Please select a CSV file");
       return;
     }
 
     const formData = new FormData();
-
     formData.append("file", file);
-
-    formData.append(
-      "source_type",
-      sourceType
-    );
+    formData.append("source_type", sourceType);
 
     try {
+      setLoading(true);
+      setMessage("");
 
       await axios.post(
-        "http://breathe-esg-lxiv.onrender.com/api/upload/",
+        `${API}/api/ingest/upload/`,
         formData,
         {
           headers: {
-            "Content-Type":
-              "multipart/form-data",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
 
-      alert("Upload successful");
-
-      fetchPending();
-
+      setMessage("Upload successful!");
+      fetchPendingReviews();
     } catch (error) {
-
-      alert(
-        error.response?.data?.error ||
-        "Upload failed"
-      );
+      console.error(error);
+      setMessage("Upload failed");
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Approve review
+  const approveReview = async (id) => {
+    try {
+      await axios.post(
+        `${API}/api/review/${id}/approve/`
+      );
 
-  const totalRecords = records.length;
+      fetchPendingReviews();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  const flaggedRecords = records.filter(
-    r => r.status === "FLAGGED"
-  ).length;
+  // Reject review
+  const rejectReview = async (id) => {
+    try {
+      await axios.post(
+        `${API}/api/review/${id}/reject/`
+      );
 
-  const pendingRecords = records.filter(
-    r => r.status === "PENDING"
-  ).length;
-
-
-  const scopeData = [
-
-    {
-      name: "Scope 1",
-      value: records.filter(
-        r => r.scope === "Scope 1"
-      ).length
-    },
-
-    {
-      name: "Scope 2",
-      value: records.filter(
-        r => r.scope === "Scope 2"
-      ).length
-    },
-
-    {
-      name: "Scope 3",
-      value: records.filter(
-        r => r.scope === "Scope 3"
-      ).length
-    },
-  ];
-
+      fetchPendingReviews();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
+    <div className="container">
+      <h1 className="title">Breathe ESG Platform</h1>
 
-    <div className="container mt-4">
+      <div className="upload-card">
+        <h2>Upload ESG CSV</h2>
 
-      <div className="text-center mb-4">
+        <select
+          value={sourceType}
+          onChange={(e) => setSourceType(e.target.value)}
+          className="dropdown"
+        >
+          <option value="SAP">SAP</option>
+          <option value="Travel">Travel</option>
+          <option value="Utilities">Utilities</option>
+        </select>
 
-        <h1 className="fw-bold">
-          Breathe ESG Dashboard
-        </h1>
+        <input
+          type="file"
+          accept=".csv"
+          onChange={(e) => setFile(e.target.files[0])}
+          className="file-input"
+        />
 
-       <p className="text-muted">
-         Enterprise ESG Data Ingestion,
-         Validation & Review System
-       </p>
+        <button onClick={handleUpload} className="upload-btn">
+          {loading ? "Uploading..." : "Upload CSV"}
+        </button>
 
+        {message && <p className="message">{message}</p>}
       </div>
 
-      <div className="card shadow p-4 mb-4">
+      <div className="review-section">
+        <h2>Pending Reviews</h2>
 
-        <h3 className="mb-3">
-          Upload ESG Data
-        </h3>
+        {records.length === 0 ? (
+          <p>No pending reviews</p>
+        ) : (
+          records.map((record) => (
+            <div key={record.id} className="record-card">
+              <div className="record-info">
+                <p>
+                  <strong>Source:</strong>{" "}
+                  {record.source_type}
+                </p>
 
-        <div className="row">
+                <p>
+                  <strong>Category:</strong>{" "}
+                  {record.category}
+                </p>
 
-          <div className="col-md-4">
+                <p>
+                  <strong>Value:</strong>{" "}
+                  {record.value}
+                </p>
 
-            <select
-              className="form-select"
-              value={sourceType}
-              onChange={(e) =>
-                setSourceType(
-                  e.target.value
-                )
-              }
-            >
+                <p>
+                  <strong>Status:</strong>{" "}
+                  {record.status}
+                </p>
+              </div>
 
-              <option value="SAP">
-                SAP Fuel Data
-              </option>
+              <div className="button-group">
+                <button
+                  className="approve-btn"
+                  onClick={() =>
+                    approveReview(record.id)
+                  }
+                >
+                  Approve
+                </button>
 
-              <option value="UTILITY">
-                Utility Electricity
-              </option>
-
-              <option value="TRAVEL">
-                Corporate Travel
-              </option>
-
-            </select>
-
-          </div>
-
-          <div className="col-md-4">
-
-            <input
-              type="file"
-              className="form-control"
-              accept=".csv"
-              onChange={(e) =>
-                setFile(
-                  e.target.files[0]
-                )
-              }
-            />
-
-          </div>
-
-          <div className="col-md-4">
-
-            <button
-              className="btn btn-primary w-100"
-              onClick={uploadFile}
-            >
-              Upload CSV
-            </button>
-
-          </div>
-
-        </div>
-
+                <button
+                  className="reject-btn"
+                  onClick={() =>
+                    rejectReview(record.id)
+                  }
+                >
+                  Reject
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
-
-      <div className="row mb-4">
-
-        <div className="col-md-4">
-
-          <div className="card shadow text-center p-3">
-
-            <h5>Total Records</h5>
-
-            <h2>{totalRecords}</h2>
-
-          </div>
-
-        </div>
-
-        <div className="col-md-4">
-
-          <div className="card shadow text-center p-3">
-
-            <h5>Pending Reviews</h5>
-
-            <h2>{pendingRecords}</h2>
-
-          </div>
-
-        </div>
-
-        <div className="col-md-4">
-
-          <div className="card shadow text-center p-3">
-
-            <h5>Flagged Records</h5>
-
-            <h2>{flaggedRecords}</h2>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div className="card shadow p-4 mb-4">
-
-        <h3 className="mb-4">
-          ESG Scope Distribution
-        </h3>
-
-        <div className="d-flex justify-content-center">
-
-          <PieChart width={400} height={300}>
-
-            <Pie
-              data={scopeData}
-              dataKey="value"
-              outerRadius={100}
-              label
-            >
-
-              {
-                scopeData.map(
-                  (entry, index) => (
-                    <Cell key={index} />
-                  )
-                )
-              }
-
-            </Pie>
-
-            <Tooltip />
-
-            <Legend />
-
-          </PieChart>
-
-        </div>
-
-      </div>
-
-      <div className="card shadow p-4">
-
-        <h3 className="mb-4">
-          Pending Reviews
-        </h3>
-
-        <div className="table-responsive">
-
-          <table className="table table-bordered table-hover">
-
-            <thead className="table-dark">
-
-              <tr>
-
-                <th>ID</th>
-                <th>Scope</th>
-                <th>Category</th>
-                <th>Value</th>
-                <th>Unit</th>
-                <th>Status</th>
-                <th>Actions</th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {
-                records.map((item) => (
-
-                  <tr key={item.id}>
-
-                    <td>{item.id}</td>
-
-                    <td>{item.scope}</td>
-
-                    <td>{item.category}</td>
-
-                    <td>{item.value}</td>
-
-                    <td>{item.unit}</td>
-
-                    <td>
-
-                      <span
-                        className={
-                          item.status ===
-                          "FLAGGED"
-
-                            ? "badge bg-danger"
-
-                            : "badge bg-warning text-dark"
-                        }
-                      >
-
-                        {item.status}
-
-                      </span>
-
-                    </td>
-
-                    <td>
-
-                      <button
-                        className="btn btn-success btn-sm me-2"
-                        onClick={() =>
-                          approveRecord(item.id)
-                        }
-                      >
-                        Approve
-                      </button>
-
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() =>
-                          rejectRecord(item.id)
-                        }
-                      >
-                        Reject
-                      </button>
-
-                    </td>
-
-                  </tr>
-
-                ))
-              }
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
     </div>
   );
 }
