@@ -357,6 +357,28 @@ Vercel auto-deploys from GitHub.
 
 ---
 
+# Current Limitations
+
+* Frontend authentication and role-based authorization are not currently implemented.
+* Administrative access is handled through Django Admin.
+* The current implementation focuses on ESG ingestion, normalization, review workflows, and audit tracking.
+* Authentication APIs and frontend login flows can be added as future enhancements if required.
+
+---
+
+# Future Enhancements
+
+* JWT/token-based authentication
+* Role-based access control
+* Protected frontend routes
+* PostgreSQL integration
+* ESG analytics dashboards
+* AI anomaly detection
+* PDF report exports
+* Real-time ESG visualization
+
+---
+
 # Author
 
 Tanishq Sharma
