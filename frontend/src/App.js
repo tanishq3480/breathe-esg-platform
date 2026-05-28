@@ -2,9 +2,19 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import "./App.css";
 
-const API = "https://breathe-esg-lxiv.onrender.com/api";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+} from "react-router-dom";
 
-function App() {
+import AuditLogPage from "./pages/AuditLogPage";
+import ReviewQueuePage from "./pages/ReviewQueuePage";
+
+const API = "http://127.0.0.1:8000/api";
+
+function Dashboard() {
   const [records, setRecords] = useState([]);
   const [file, setFile] = useState(null);
   const [sourceType, setSourceType] = useState("SAP");
@@ -15,7 +25,7 @@ function App() {
   const fetchPendingReviews = async () => {
     try {
       const response = await axios.get(
-        `${API}/review/pending/`
+        `${API}/reviews/queue/`
       );
 
       setRecords(response.data);
@@ -42,7 +52,7 @@ function App() {
     try {
       setLoading(true);
 
-      await axios.post(
+      const response = await axios.post(
         `${API}/upload/`,
         formData,
         {
@@ -52,11 +62,17 @@ function App() {
         }
       );
 
+      console.log(response.data);
+
       setMessage("Upload successful");
+
       fetchPendingReviews();
     } catch (error) {
       console.error(error);
-      setMessage("Upload failed");
+
+      setMessage(
+        error.response?.data?.error || "Upload failed"
+      );
     } finally {
       setLoading(false);
     }
@@ -92,14 +108,12 @@ function App() {
         record.category
           ?.toLowerCase()
           .includes(search.toLowerCase()) ||
-        record.value
+        record.normalized_value
           ?.toString()
           .includes(search)
       );
     });
   }, [records, search]);
-
-  const totalRecords = records.length;
 
   return (
     <div className="container">
@@ -111,13 +125,26 @@ function App() {
         Enterprise ESG ingestion and review system
       </p>
 
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          marginBottom: "20px",
+        }}
+      >
+        <Link to="/">Dashboard</Link>
+        <Link to="/audit">Audit Logs</Link>
+        <Link to="/review">Review Queue</Link>
+      </div>
+
       <div className="metrics-grid">
         <div className="metric-card">
           <div className="metric-title">
             Pending Reviews
           </div>
+
           <div className="metric-value">
-            {totalRecords}
+            {records.length}
           </div>
         </div>
 
@@ -125,6 +152,7 @@ function App() {
           <div className="metric-title">
             Source Types
           </div>
+
           <div className="metric-value">
             3
           </div>
@@ -134,6 +162,7 @@ function App() {
           <div className="metric-title">
             ESG Pipelines
           </div>
+
           <div className="metric-value">
             Active
           </div>
@@ -143,6 +172,7 @@ function App() {
           <div className="metric-title">
             System Status
           </div>
+
           <div className="metric-value">
             Live
           </div>
@@ -161,11 +191,13 @@ function App() {
             className="dropdown"
           >
             <option value="SAP">SAP</option>
-            <option value="Travel">
-              Travel
+
+            <option value="TRAVEL">
+              TRAVEL
             </option>
-            <option value="Utilities">
-              Utilities
+
+            <option value="UTILITY">
+              UTILITIES
             </option>
           </select>
 
@@ -233,7 +265,7 @@ function App() {
 
                 <p>
                   <strong>Value:</strong>{" "}
-                  {record.value}
+                  {record.normalized_value}
                 </p>
 
                 <p>
@@ -268,6 +300,29 @@ function App() {
         )}
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={<Dashboard />}
+        />
+
+        <Route
+          path="/audit"
+          element={<AuditLogPage />}
+        />
+
+        <Route
+          path="/review"
+          element={<ReviewQueuePage />}
+        />
+      </Routes>
+    </Router>
   );
 }
 
