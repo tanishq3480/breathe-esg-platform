@@ -12,7 +12,7 @@ import {
 import AuditLogPage from "./pages/AuditLogPage";
 import ReviewQueuePage from "./pages/ReviewQueuePage";
 
-const API = "http://127.0.0.1:8000/api";
+const API ="https://breathe-esg-lxiv.onrender.com/api";
 
 function Dashboard() {
   const [records, setRecords] = useState([]);
