@@ -1,21 +1,20 @@
 # Breathe ESG Platform
 
-Enterprise ESG Intelligence & Emissions Review Platform built using Django + React.
+Prototype ESG Intelligence & Emissions Review Platform built using Django and React.
 
 ---
 
 # Overview
 
-Breathe ESG Platform is an ESG data ingestion and emissions intelligence system that allows organizations to:
+Breathe ESG Platform is a full-stack ESG data ingestion and emissions review system that allows organizations to:
 
 * Upload ESG CSV datasets
 * Normalize emissions data
-* Review & approve flagged emissions
+* Review and approve flagged records
 * Maintain audit logs
-* Support multi-tenant ESG workflows
 * Track Scope 1, Scope 2, and Scope 3 emissions
 
-The platform simulates an enterprise-grade ESG pipeline similar to real sustainability reporting systems.
+The platform demonstrates a simplified enterprise ESG workflow for sustainability reporting and emissions monitoring.
 
 ---
 
@@ -23,57 +22,58 @@ The platform simulates an enterprise-grade ESG pipeline similar to real sustaina
 
 ## ESG CSV Upload
 
-* Upload CSV files from:
+Supports CSV uploads from:
 
-  * SAP
-  * Utility systems
-  * Travel systems
+* SAP
+* Utility systems
+* Travel systems
+
+---
 
 ## Automated Emission Calculations
 
-System automatically:
+The system:
 
-* Detects emission values
+* Extracts numeric ESG values
 * Applies emission factors
-* Calculates kg CO2e
+* Calculates kg CO2e emissions
 
-## Multi-Tenant Support
-
-Supports separate tenants for:
-
-* Different organizations
-* Business units
-* Clients
+---
 
 ## Review Workflow
 
-Analysts can:
+Users can:
 
+* View pending ESG records
 * Approve records
 * Reject records
-* Review flagged emissions
+
+---
 
 ## Audit Logging
 
 Tracks:
 
 * Upload actions
-* Approvals
-* Rejections
-* User activity
+* Approval actions
+* Rejection actions
+
+---
 
 ## REST APIs
 
-Complete backend API using Django REST Framework.
+Backend APIs built using Django REST Framework.
 
-## Responsive Frontend
+---
 
-Modern React dashboard with:
+## Frontend Dashboard
+
+React frontend includes:
 
 * Upload interface
 * Review queue
 * Audit logs
-* ESG metrics
+* ESG metrics cards
 
 ---
 
@@ -95,14 +95,14 @@ Modern React dashboard with:
 
 ## Deployment
 
-* Frontend → Vercel
-* Backend → Render
+* Frontend deployed on Vercel
+* Backend deployed on Render
 
 ---
 
 # Project Structure
 
-```bash
+```bash id="w1a3pm"
 breathe_esg/
 │
 ├── backend/
@@ -125,20 +125,19 @@ breathe_esg/
 
 # Backend Setup
 
-## 1. Clone Repository
+## Clone Repository
 
-```bash
+```bash id="htf3gj"
 git clone https://github.com/tanishq3480/breathe-esg-platform.git
 cd breathe-esg-platform
 ```
 
 ---
 
-## 2. Create Virtual Environment
+## Create Virtual Environment
 
-```bash
+```bash id="pfdjlwm"
 cd backend
-
 python -m venv venv
 ```
 
@@ -146,52 +145,52 @@ Activate environment:
 
 ### Windows
 
-```bash
+```bash id="p98l2h"
 venv\Scripts\activate
 ```
 
 ### Linux / Mac
 
-```bash
+```bash id="r7c4n0"
 source venv/bin/activate
 ```
 
 ---
 
-## 3. Install Dependencies
+## Install Dependencies
 
-```bash
+```bash id="2m4m9f"
 pip install -r requirements.txt
 ```
 
 ---
 
-## 4. Run Migrations
+## Run Migrations
 
-```bash
+```bash id="9j1aj8"
 python manage.py makemigrations
 python manage.py migrate
 ```
 
 ---
 
-## 5. Create Superuser
+## Create Admin User
 
-```bash
+```bash id="8qjcs6"
 python manage.py createsuperuser
 ```
 
 ---
 
-## 6. Start Backend Server
+## Start Backend
 
-```bash
+```bash id="ik0yeu"
 python manage.py runserver
 ```
 
-Backend runs at:
+Backend URL:
 
-```bash
+```bash id="i3gkq5"
 http://127.0.0.1:8000
 ```
 
@@ -199,53 +198,49 @@ http://127.0.0.1:8000
 
 # Frontend Setup
 
-## 1. Navigate to Frontend
+## Navigate to Frontend
 
-```bash
+```bash id="9v02mx"
 cd frontend
 ```
 
 ---
 
-## 2. Install Dependencies
+## Install Dependencies
 
-```bash
+```bash id="k5n0ls"
 npm install
 ```
 
 ---
 
-## 3. Configure Backend API
+## Configure API URL
 
-Inside:
+Inside `src/App.js`:
 
-```bash
-src/App.js
-```
+Local backend:
 
-Set:
-
-```javascript
+```javascript id="jlwm2r"
 const API = "http://127.0.0.1:8000/api"
 ```
 
-For deployed backend:
+Production backend:
 
-```javascript
-const API = "https://your-render-backend-url.onrender.com/api"
+```javascript id="7mpjlwm"
+const API = "https://your-render-url.onrender.com/api"
 ```
 
 ---
 
-## 4. Start Frontend
+## Start Frontend
 
-```bash
+```bash id="0dzd0m"
 npm start
 ```
 
-Frontend runs at:
+Frontend URL:
 
-```bash
+```bash id="t7ey6x"
 http://localhost:3000
 ```
 
@@ -255,7 +250,7 @@ http://localhost:3000
 
 ## Upload CSV
 
-```http
+```http id="1l5t1n"
 POST /api/upload/
 ```
 
@@ -263,7 +258,7 @@ POST /api/upload/
 
 ## Review Queue
 
-```http
+```http id="4l5g2r"
 GET /api/reviews/queue/
 ```
 
@@ -271,7 +266,7 @@ GET /api/reviews/queue/
 
 ## Approve Record
 
-```http
+```http id="ln9n6s"
 POST /api/review/approve/<id>/
 ```
 
@@ -279,7 +274,7 @@ POST /api/review/approve/<id>/
 
 ## Reject Record
 
-```http
+```http id="xmx8bq"
 POST /api/review/reject/<id>/
 ```
 
@@ -287,7 +282,7 @@ POST /api/review/reject/<id>/
 
 ## Audit Logs
 
-```http
+```http id="0kh91e"
 GET /api/audit/logs/
 ```
 
@@ -295,7 +290,7 @@ GET /api/audit/logs/
 
 ## All Records
 
-```http
+```http id="zq90b6"
 GET /api/records/
 ```
 
@@ -303,17 +298,17 @@ GET /api/records/
 
 # Authentication
 
-Django Admin Authentication is enabled.
+Django admin authentication is enabled.
 
 Admin panel:
 
-```bash
+```bash id="8ckmzg"
 /admin
 ```
 
 Create admin user:
 
-```bash
+```bash id="m6nvsk"
 python manage.py createsuperuser
 ```
 
@@ -321,29 +316,29 @@ python manage.py createsuperuser
 
 # Deployment
 
-## Backend Deployment (Render)
+## Backend (Render)
 
-### Build Command
+Build command:
 
-```bash
+```bash id="q7r4q7"
 pip install -r requirements.txt
 ```
 
-### Start Command
+Start command:
 
-```bash
+```bash id="w5p3vb"
 gunicorn config.wsgi
 ```
 
 ---
 
-## Frontend Deployment (Vercel)
+## Frontend (Vercel)
 
-Push frontend changes to GitHub:
+Push changes to GitHub:
 
-```bash
+```bash id="v3gyyf"
 git add .
-git commit -m "frontend deployment"
+git commit -m "deployment update"
 git push origin main
 ```
 
@@ -351,36 +346,14 @@ Vercel auto-deploys from GitHub.
 
 ---
 
-# Sample ESG Workflow
+# ESG Workflow
 
-1. Upload CSV
-2. Backend normalizes data
-3. Emissions calculated automatically
+1. Upload CSV file
+2. Backend normalizes ESG data
+3. Emissions are calculated
 4. Records enter review queue
-5. Analyst approves/rejects
-6. Audit logs generated
-
----
-
-# Sample Emission Factors
-
-| Source Type | Factor |
-| ----------- | ------ |
-| SAP         | 2.68   |
-| Utility     | 0.82   |
-| Travel      | 0.255  |
-
----
-
-# Future Improvements
-
-* JWT Authentication
-* Role-based access control
-* PostgreSQL integration
-* ESG analytics dashboard
-* AI anomaly detection
-* PDF reporting
-* Real-time charts
+5. User approves/rejects records
+6. Audit logs are generated
 
 ---
 
@@ -392,4 +365,4 @@ Tanishq Sharma
 
 # License
 
-This project is developed for educational and assessment purposes.
+Developed for educational and assessment purposes.
