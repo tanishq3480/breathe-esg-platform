@@ -4,7 +4,8 @@ from .views import (
     upload_csv,
     pending_reviews,
     approve_record,
-    reject_record
+    reject_record,
+    audit_logs
 )
 
 urlpatterns = [
@@ -22,6 +23,10 @@ urlpatterns = [
     path(
         'review/approve/<int:pk>/',
         approve_record
+    ),
+    path(
+        'audit-logs/',
+        audit_logs
     ),
 
     path(

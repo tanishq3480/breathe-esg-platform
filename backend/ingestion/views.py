@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
-
+from reviews.models import ReviewQueue
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -104,7 +104,7 @@ def upload_csv(request):
                 raw_data=row_dict,
                 uploaded_by=actor,
             )
-
+            
             value = extract_value(row_dict, source_type)
             emissions = round(value * ef, 4)
             record_status = 'FLAGGED' if value > 10000 else 'PENDING'
@@ -122,12 +122,15 @@ def upload_csv(request):
             )
 
             AuditLog.objects.create(
-                entity_type='NormalizedEmission',
+                entity_type="NormalizedEmission",
                 entity_id=emission.id,
-                action='INGESTED',
-                old_data=None,
-                new_data=row_dict,
-                performed_by=actor,
+                action="INGESTED",
+                performed_by= "system",
+            )
+
+            ReviewQueue.objects.create(
+                record=emission,
+                status="PENDING"
             )
 
             rows_created += 1
@@ -145,27 +148,20 @@ def upload_csv(request):
 
 @api_view(['GET'])
 def pending_reviews(request):
-    qs = NormalizedEmission.objects.filter(
-        status__in=['PENDING', 'FLAGGED']
-    ).select_related('raw_record', 'tenant')
+    records = NormalizedEmission.objects.all().order_by('-id')
 
-    data = [{
-        "id": r.id,
-        "scope": r.scope,
-        "category": r.category,
-        "value": r.normalized_value,
-        "unit": r.unit,
-        "emissions_kg_co2e": r.emissions_kg_co2e,
-        "emission_factor": r.emission_factor,
-        "status": r.status,
-        "tenant": r.tenant.name if r.tenant else None,
-        "source": r.raw_record.source_type,
-        "uploaded_at": r.raw_record.uploaded_at,
-        "suspicious": r.status == 'FLAGGED',
-    } for r in qs]
+    data = []
+    for r in records:
+        data.append({
+            "id": r.pk,
+            "scope": r.scope,
+            "category": r.category,
+            "normalized_value": r.normalized_value,
+            "emissions_kg_co2e": r.emissions_kg_co2e,
+            "status": r.status
+        })
 
     return Response(data)
-
 
 @api_view(['GET'])
 def all_records(request):
@@ -174,7 +170,7 @@ def all_records(request):
     ).select_related('raw_record', 'tenant')
 
     data = [{
-        "id": r.id,
+        "id": r.pk,
         "scope": r.scope,
         "category": r.category,
         "value": r.normalized_value,
@@ -197,7 +193,7 @@ def approve_record(request, pk):
     record = get_object_or_404(NormalizedEmission, pk=pk)
     actor = request.user.username if request.user.is_authenticated else 'analyst'
     old_status = record.status
-
+    from audit.models import AuditLog
     record.status = 'APPROVED'
     record.edited_at = timezone.now()
     record.edited_by = actor
@@ -209,7 +205,7 @@ def approve_record(request, pk):
         action='APPROVED',
         old_data={'status': old_status},
         new_data={'status': 'APPROVED'},
-        performed_by=actor,
+        performed_by=request.user.username if request.user.is_authenticated else "admin",
     )
 
     return Response({"message": f"Record {pk} approved"})
@@ -232,7 +228,40 @@ def reject_record(request, pk):
         action='REJECTED',
         old_data={'status': old_status},
         new_data={'status': 'REJECTED'},
-        performed_by=actor,
+        performed_by=request.user.username if request.user.is_authenticated else "admin",
     )
 
     return Response({"message": f"Record {pk} rejected"})
+
+@api_view(['GET'])
+def audit_logs(request):
+    logs = AuditLog.objects.all().order_by('-timestamp')
+    return Response([
+        {
+            "entity_type": l.entity_type,
+            "entity_id": l.entity_id,
+            "action": l.action,
+            "performed_by": l.performed_by,
+            "timestamp": l.timestamp
+        } for l in logs
+    ])
+    
+@api_view(["GET"])
+def normalized_emissions(request):
+
+    records = NormalizedEmission.objects.all().order_by("-id")
+
+    data = []
+
+    for r in records:
+        data.append({
+            "id": r.id,
+            "scope": r.scope,
+            "category": r.category,
+            "normalized_value": r.normalized_value,
+            "unit": r.unit,
+            "emissions": r.emissions_kg_co2e,
+            "status": r.status,
+        })
+
+    return Response(data)

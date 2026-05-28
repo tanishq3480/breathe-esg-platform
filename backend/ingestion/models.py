@@ -10,6 +10,7 @@ class RawIngestion(models.Model):
         ('TRAVEL', 'TRAVEL'),
     ]
 
+    id = models.AutoField(primary_key=True)
     source_type = models.CharField(max_length=50, choices=SOURCE_CHOICES)
     raw_data = models.JSONField()
     uploaded_at = models.DateTimeField(auto_now_add=True)
@@ -32,7 +33,7 @@ class NormalizedEmission(models.Model):
     tenant = models.ForeignKey(
         Tenant, on_delete=models.CASCADE, null=True, blank=True
     )
-    raw_record = models.ForeignKey(RawIngestion, on_delete=models.CASCADE)
+    raw_record = models.ForeignKey(RawIngestion, null=True, blank=True, on_delete=models.CASCADE)
     scope = models.CharField(max_length=20)
     category = models.CharField(max_length=100)
     normalized_value = models.FloatField()

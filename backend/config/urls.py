@@ -34,6 +34,15 @@ urlpatterns = [
     ),
 
     path(
+        'api/audit/',
+        include('audit.urls')
+    ),
+    
+    path("api/reviews/", include("reviews.urls")),
+    
+    path("api/ingestion/", include("ingestion.urls")),
+    
+    path(
         'swagger/',
         schema_view.with_ui(
             'swagger',
