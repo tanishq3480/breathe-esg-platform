@@ -8,7 +8,7 @@ function EmissionTable() {
     useEffect(() => {
 
         axios
-            .get('http://127.0.0.1:8000/api/ingestion/')
+            .get('http://breathe-esg-lxiv.onrender.com/api/ingestion/')
             .then((response) => {
                 setRecords(response.data)
             })
