@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Breathe ESG Platform — Data Model
 
 Enterprise ESG Data Modeling Layer for ingestion, normalization, review, and audit tracking.
@@ -182,7 +182,7 @@ This ensures:
 - Machine learning-based anomaly detection
 - Full GHG Protocol compliance engine
 - Row-level database security
-=======
+
 # Breathe ESG Platform — Data Model
 
 Enterprise ESG Data Modeling Layer for ingestion, normalization, review, and audit tracking.
@@ -366,5 +366,4 @@ This ensures:
 - Machine learning-based anomaly detection
 - Full GHG Protocol compliance engine
 - Row-level database security
->>>>>>> 77e7ee863e39eaca7c28d2f5f33042f6920c69ea
 - Real-time SAP integration (IDoc/OData/BAPI)
