@@ -13,7 +13,7 @@ function ReviewQueuePage() {
   const fetchRecords = async () => {
     try {
       const response = await axios.get(
-        `${API}/review/pending/`
+        `${API}/reviews/queue/`
       );
 
       console.log(response.data);
